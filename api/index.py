@@ -247,7 +247,9 @@ def api_login():
         
         attendance_data, att_msg = scraper.get_attendance()
         if not attendance_data:
-            return jsonify({'success': False, 'error': 'Failed to fetch attendance'})
+            return jsonify({'success': False, 'error': '⚠️ Attendance Unavailable
+The college is updating or has paused attendance.
+Please check back later.'})
         
         course_mapping, _ = scraper.get_timetable()
         weekly_schedule, _ = scraper.get_weekly_schedule()
