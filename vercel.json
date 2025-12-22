@@ -2,31 +2,7 @@
   "routes": [
     {
       "src": "/favicon.ico",
-      "dest": "/static/favicon.ico"
-    },
-    {
-      "src": "/favicon-16x16.png",
-      "dest": "/static/favicon-16x16.png"
-    },
-    {
-      "src": "/favicon-32x32.png",
-      "dest": "/static/favicon-32x32.png"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "dest": "/static/apple-touch-icon.png"
-    },
-    {
-      "src": "/android-chrome-192x192.png",
-      "dest": "/static/android-chrome-192x192.png"
-    },
-    {
-      "src": "/android-chrome-512x512.png",
-      "dest": "/static/android-chrome-512x512.png"
-    },
-    {
-      "src": "/site.webmanifest",
-      "dest": "/static/site.webmanifest"
+      "dest": "/api/favicon.py"
     },
     {
       "src": "/(.*)",
