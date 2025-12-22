@@ -28,6 +28,8 @@
       "src": "/site.webmanifest",
       "dest": "/static/site.webmanifest"
     },
+
+    // ⭐ THIS WAS MISSING ⭐
     {
       "src": "/(.*)",
       "dest": "/api/$1"
