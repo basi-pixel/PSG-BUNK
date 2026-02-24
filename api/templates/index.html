@@ -465,7 +465,7 @@
             width: 100%;
             height: 100%;
             z-index: 10000;
-            transition: opacity 0.6s ease, visibility 0.6s ease;
+            transition: opacity 0.8s ease, visibility 0.8s ease;
         }
 
         #rip-page.hidden {
@@ -476,15 +476,23 @@
         
         .svg-rip {
             cursor: pointer !important;
+            transition: filter 0.2s ease;
+        }
+        
+        .svg-rip:active {
+            filter: drop-shadow(0 0 25px rgba(129, 92, 255, 1.2)) !important;
         }
         
         /* Hide Bunker app by default */
         #bunker-app {
             display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
         
         #bunker-app.visible {
             display: block;
+            opacity: 1;
         }
     </style>
 </head>
@@ -492,9 +500,7 @@
 <body>
     <!-- R.I.P. Memorial Page (Visible by default) -->
     <div id="rip-page">
-        
-
-    <!-- Ambient Particle Engine Canvas -->
+        <!-- Ambient Particle Engine Canvas -->
     <canvas id="particles"></canvas>
 
     <div class="memorial-container">
@@ -571,80 +577,6 @@
             </svg>
         </div>
     </div>
-
-    <script>
-        // --- Ambient Magical Embers Engine ---
-        const canvas = document.getElementById('particles');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let particles = [];
-        
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-
-        class Spark {
-            constructor() { this.reset(true); }
-            
-            reset(randomY = false) {
-                this.x = Math.random() * width;
-                // Spread embers evenly or start from the bottom
-                this.y = randomY ? Math.random() * height : height + 20;
-                this.size = Math.random() * 2.5 + 0.5;
-                // Slower, more majestic rise
-                this.speedY = -(Math.random() * 1 + 0.3); 
-                this.speedX = (Math.random() - 0.5) * 0.6;
-                this.life = Math.random() * 0.8 + 0.2;
-                
-                // Color palette: Deep Purple, Bright Neon Purple, Soft Starlight White
-                const colors = ['129, 92, 255', '180, 140, 255', '240, 235, 255'];
-                this.color = colors[Math.floor(Math.random() * colors.length)];
-            }
-            
-            update() {
-                this.y += this.speedY;
-                // Gentle sway
-                this.x += this.speedX + Math.sin(this.y * 0.005) * 0.5;
-                
-                // Smooth fade based on height
-                let opacity = (this.y / height) * this.life;
-                if (opacity < 0) opacity = 0;
-                this.currentFill = `rgba(${this.color}, ${opacity})`;
-
-                // Recycle particle when it floats off the top
-                if (this.y < -30) this.reset();
-            }
-            
-            draw() {
-                ctx.beginPath();
-                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-                ctx.fillStyle = this.currentFill;
-                ctx.shadowBlur = 12;
-                ctx.shadowColor = `rgba(${this.color}, ${this.life})`;
-                ctx.fill();
-                ctx.shadowBlur = 0; // reset for next drawing
-            }
-        }
-
-        function initParticles() {
-            particles = [];
-            // Increased count slightly to fill the space beautifully
-            for (let i = 0; i < 60; i++) particles.push(new Spark());
-        }
-
-        function animate() {
-            ctx.clearRect(0, 0, width, height);
-            particles.forEach(p => { p.update(); p.draw(); });
-            requestAnimationFrame(animate);
-        }
-
-        window.addEventListener('resize', resize);
-        resize();
-        initParticles();
-        animate();
-    </script>
-
     </div>
 
     <!-- Main Bunker App (Hidden by default) -->
@@ -1184,42 +1116,80 @@
 
     <!-- Main Logic -->
     <script src="/static/legal.js?v=1.0.1" defer></script>
-    <script src="/static/app.js?v=1.0.1" defer></script>
+    
+        <script src="/static/app.js?v=1.0.1" defer></script>
 
     </div>
 
-    <!-- Secret Feature Script -->
+    <!-- Secret Feature Script - MUST LOAD FIRST -->
     <script>
-        let ripClickCount = 0;
-        const ripText = document.getElementById('rip-text');
-        const ripPage = document.getElementById('rip-page');
-        const bunkerApp = document.getElementById('bunker-app');
+        (function() {
+            let ripClickCount = 0;
+            let isUnlocked = false;
+            
+            // Wait for DOM to be ready
+            function initSecretFeature() {
+                const ripText = document.getElementById('rip-text');
+                const ripPage = document.getElementById('rip-page');
+                const bunkerApp = document.getElementById('bunker-app');
 
-        if (ripText) {
-            ripText.addEventListener('click', function() {
-                ripClickCount++;
-                
-                if (ripClickCount === 7) {
-                    // Hide R.I.P. page and show Bunker app
-                    ripPage.classList.add('hidden');
-                    bunkerApp.classList.add('visible');
+                if (!ripText || !ripPage || !bunkerApp) {
+                    console.log('Elements not found, retrying...');
+                    setTimeout(initSecretFeature, 100);
+                    return;
                 }
-            });
 
-            // Reset counter if no clicks for 3 seconds
-            let resetTimer;
-            ripText.addEventListener('click', function() {
-                clearTimeout(resetTimer);
-                resetTimer = setTimeout(function() {
-                    ripClickCount = 0;
-                }, 3000);
-            });
-        }
+                console.log('Secret feature initialized');
+
+                ripText.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    if (isUnlocked) return;
+                    
+                    ripClickCount++;
+                    console.log('RIP clicked:', ripClickCount, 'times');
+                    
+                    if (ripClickCount >= 7) {
+                        console.log('Unlocking Bunker app...');
+                        isUnlocked = true;
+                        
+                        // Hide R.I.P. page and show Bunker app
+                        ripPage.classList.add('hidden');
+                        
+                        setTimeout(() => {
+                            bunkerApp.classList.add('visible');
+                            bunkerApp.style.display = 'block';
+                        }, 300);
+                    }
+                });
+
+                // Reset counter if no clicks for 3 seconds
+                let resetTimer;
+                ripText.addEventListener('click', function() {
+                    clearTimeout(resetTimer);
+                    resetTimer = setTimeout(function() {
+                        if (!isUnlocked) {
+                            ripClickCount = 0;
+                            console.log('Counter reset');
+                        }
+                    }, 3000);
+                });
+            }
+
+            // Initialize when DOM is ready
+            if (document.readyState === 'loading') {
+                document.addEventListener('DOMContentLoaded', initSecretFeature);
+            } else {
+                initSecretFeature();
+            }
+        })();
     </script>
 
     <!-- R.I.P. Page Particle Animation Script -->
     <script>
-        
+        (function() {
+            
         // --- Ambient Magical Embers Engine ---
         const canvas = document.getElementById('particles');
         const ctx = canvas.getContext('2d');
@@ -1291,6 +1261,7 @@
         initParticles();
         animate();
     
+        })();
     </script>
 </body>
 
